@@ -1,3 +1,7 @@
+---
+bibliography: references.bib
+---
+
 # migale25
 
 -   hello world
@@ -7,5 +11,6 @@
 
 2+2=5 probleme de calcul 2+2=4
 
-
 3! = 6
+
+[@phyloseq.extended-2]
