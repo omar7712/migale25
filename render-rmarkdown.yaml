@@ -1,0 +1,32 @@
+on:
+  push:
+    paths: ['**.Rmd']
+
+name: render-rmarkdown
+
+jobs:
+  render-rmarkdown:
+    runs-on: ubuntu-latest
+    container:
+      image: rocker/verse:4
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install packages
+        run: |
+          Rscript -e 'install.packages("rmarkdown")'
+      
+      - name: Render Rmarkdown files and Commit Results
+        run: |
+          Rscript -e "purrr::map(fs::dir_ls(regexp = '.Rmd$'), rmarkdown::render)"
+          git config --global --add safe.directory /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}
+          git config --global user.name "$GITHUB_ACTOR"
+          git config --global user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          git add *.html
+          git commit -m 'Re-build Rmarkdown files' || echo "No changes to commit"
+          git push origin || echo "No changes to commit"
